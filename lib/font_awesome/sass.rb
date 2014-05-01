@@ -6,13 +6,17 @@ module FontAwesome
           register_rails_engine
         end
 
+        if asset_pipeline?
+          register_sprockets_paths
+        end
+
         if compass?
           register_compass_extension
         end
       end
 
       def gem_path
-        @gem_path ||= File.expand_path('..', File.dirname(__FILE__))
+        @gem_path ||= File.expand_path('../..', File.dirname(__FILE__))
       end
 
       def stylesheets_path
@@ -27,6 +31,11 @@ module FontAwesome
         @assets_path ||= File.join(gem_path, 'vendor', 'assets')
       end
 
+      # Environment detection helpers
+      def asset_pipeline?
+        defined?(::Sprockets)
+      end
+
       def compass?
         defined?(::Compass)
       end
@@ -36,6 +45,12 @@ module FontAwesome
       end
 
       private
+
+      def register_sprockets_paths
+        require 'sprockets'
+        Sprockets.append_path fonts_path
+        Sprockets.append_path stylesheets_path
+      end
 
       def register_compass_extension
         ::Compass::Frameworks.register(
